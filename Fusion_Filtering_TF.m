@@ -1,3 +1,5 @@
+load("measured_data.mat")
+
 %% pentru 120
 
 t1 = out1.simout1.Time;
@@ -135,9 +137,30 @@ Hp_med_dead = Hp_med * exp(-tau_med*s)
   % exp(-1.65*s) * ----------
   %                1.35 s + 1
 
-%% pentru PID
+%% coeficienti pentru PID
 
 Ti = T_med;
 Timp = 3;
 Kp = Ti/(K_med*Timp);
 Ki = Kp/Ti;
+
+%% functia de sensibilitate
+
+PI = Kp + Ki/s;
+
+HS = 1 - (PI*Hp_med_dead)/(1 + PI*Hp_med);
+
+figure;
+bode(HS);
+grid on;
+title('Sensibilitate');
+
+%% Discretizare
+
+Ts = 0.1;
+
+PI = Kp + Ki/s;
+
+N_dead = round(tau_med/Ts)
+PI_discret = c2d(PI, Ts, 'tustin')
+Hp_discret = c2d(Hp_med, Ts, 'zoh')
